@@ -2,7 +2,8 @@ package main
 
 import (
 	"database/sql"
-	_ "github.com/ISNewton/database/internal"
+	_ "github.com/ISNewton/rss-aggregator/internal/database"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
@@ -13,7 +14,7 @@ import (
 )
 
 type apiConfig struct {
-	DB *internal.Queries
+	DB *database.Queries
 }
 
 func main() {
