@@ -2,20 +2,21 @@ package main
 
 import (
 	"database/sql"
+	_ "github.com/ISNewton/database/internal"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
-	_ "github.com/lig/pq"
+	_ "github.com/lib/pq"
 	"log"
 	"net/http"
 	"os"
 )
 
-func main() {
+type apiConfig struct {
+	DB *internal.Queries
+}
 
-	type apiConfig struct {
-		DB *sql.DB
-	}
+func main() {
 
 	// Load env
 	err := godotenv.Load()
@@ -43,10 +44,12 @@ func main() {
 		log.Fatal("Error connecting to database")
 	}
 
+	queries := database.New(connection)
+
 	apiCfg := apiConfig{
-		DB: connection,
+		DB: queries,
 	}
-	apiCfg.DB.
+
 	//router
 	router := chi.NewRouter()
 
@@ -61,11 +64,16 @@ func main() {
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	}))
 
-	userRouter := chi.NewRouter()
-	userRouter.Get("/health", handleReadiness)
-	userRouter.Get("/error", handleError)
+	serverRouter := chi.NewRouter()
+	serverRouter.Get("/health", handleReadiness)
+	serverRouter.Get("/error", handleError)
 
-	router.Mount("/server", userRouter)
+	router.Mount("/server", serverRouter)
+
+	userRouter := chi.NewRouter()
+	userRouter.Post("/", apiCfg.handleCreateUser)
+
+	router.Mount("/users", userRouter)
 
 	server := &http.Server{
 		Handler: router,
