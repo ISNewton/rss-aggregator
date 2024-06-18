@@ -20,3 +20,15 @@ func respondWithJson(w http.ResponseWriter, code int, data interface{}) {
 	w.Write(json)
 
 }
+
+func respondWithError(w http.ResponseWriter, code int, message string) {
+	if code >= 500 {
+		type errorResponse struct {
+			Error string `json:"error"`
+			Code  int    `json:"code"`
+		}
+
+		respondWithJson(w, code, errorResponse{Error: message, Code: code})
+	}
+
+}

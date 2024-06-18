@@ -37,6 +37,7 @@ func main() {
 
 	userRouter := chi.NewRouter()
 	userRouter.Get("/health", handleReadiness)
+	userRouter.Get("/error", handleError)
 
 	router.Mount("/server", userRouter)
 
