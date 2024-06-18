@@ -1,9 +1,11 @@
 package main
 
 import (
+	"database/sql"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
+	_ "github.com/lig/pq"
 	"log"
 	"net/http"
 	"os"
@@ -11,17 +13,41 @@ import (
 
 func main() {
 
+	type apiConfig struct {
+		DB *sql.DB
+	}
+
+	// Load env
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
 
+	// Load Port
 	port := os.Getenv("PORT")
 
 	if port == "" {
 		log.Fatal("Set PORT environment variable")
 	}
 
+	//DB
+	dbUrl := os.Getenv("DATABASE_URL")
+
+	if dbUrl == "" {
+		log.Fatal("Set DATABASE_URL environment variable")
+	}
+
+	connection, err := sql.Open("postgres", dbUrl)
+
+	if err != nil {
+		log.Fatal("Error connecting to database")
+	}
+
+	apiCfg := apiConfig{
+		DB: connection,
+	}
+	apiCfg.DB.
+	//router
 	router := chi.NewRouter()
 
 	router.Use(cors.Handler(cors.Options{
