@@ -8,3 +8,9 @@ RETURNING *;
 UPDATE users SET api_key = $1 WHERE id = $2
 RETURNING api_key ;
 
+
+
+-- name: GetUserByApiKey :one
+SELECT * FROM users WHERE api_key = $1;
+
+

@@ -72,6 +72,8 @@ func main() {
 
 	userRouter := chi.NewRouter()
 	userRouter.Post("/", apiCfg.handleCreateUser)
+	userRouter.Post("/generateApiKey", apiCfg.handleIssueApiKey)
+	userRouter.Get("/getUserByApiKey", apiCfg.handleRetrieveUser)
 
 	router.Mount("/users", userRouter)
 
