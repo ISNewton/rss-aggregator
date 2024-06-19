@@ -7,6 +7,7 @@ package schema
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -15,7 +16,7 @@ import (
 const createUser = `-- name: CreateUser :one
 INSERT INTO users(id , name , created_at , updated_at)
 VALUES ($1 , $2 , $3 , $4)
-RETURNING id, name, created_at, updated_at
+RETURNING id, name, created_at, updated_at, api_key
 `
 
 type CreateUserParams struct {
@@ -38,6 +39,24 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.Name,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.ApiKey,
 	)
 	return i, err
+}
+
+const issueApiKey = `-- name: IssueApiKey :one
+UPDATE users SET api_key = $1 WHERE id = $2
+RETURNING api_key
+`
+
+type IssueApiKeyParams struct {
+	ApiKey sql.NullString
+	ID     uuid.UUID
+}
+
+func (q *Queries) IssueApiKey(ctx context.Context, arg IssueApiKeyParams) (sql.NullString, error) {
+	row := q.db.QueryRowContext(ctx, issueApiKey, arg.ApiKey, arg.ID)
+	var api_key sql.NullString
+	err := row.Scan(&api_key)
+	return api_key, err
 }
