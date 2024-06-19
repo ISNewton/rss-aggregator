@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"github.com/ISNewton/rss-aggregator/internal/database/schema"
+	"github.com/ISNewton/rss-aggregator/models"
 	"github.com/google/uuid"
 	"log"
 	"net/http"
@@ -38,6 +39,6 @@ func (apiCfg apiConfig) handleCreateUser(w http.ResponseWriter, r *http.Request)
 		respondWithError(w, http.StatusInternalServerError, userError.Error())
 	}
 
-	respondWithJson(w, 200, user)
+	respondWithJson(w, 200, models.ConvertToUserModel(user))
 
 }
